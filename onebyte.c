@@ -38,12 +38,53 @@ return 0; // always successful
 
 ssize_t onebyte_read(struct file *filep, char *buf, size_t count, loff_t *f_pos)
 {
-/*please complete the function on your own*/
+/*Transferring a single byte from the driver buffer to the user space*/
+//copy_to_user(buf,onebyte_data,1);
+
+
+/* Checking the reading position, if its in the beginning of the file as the device reads only one character. If position doesn't match beginning of the file, then return 0 */
+
+  if (*f_pos == 0) {
+
+      *f_pos+=1;
+     // *f_pos+=count; 
+     copy_to_user(buf,onebyte_data,1);
+
+    return 1;
+
+  } else {
+
+   // *f_pos -= (count-1);
+
+    return 0;
+
+  }
+
 }
 
 ssize_t onebyte_write(struct file *filep, const char *buf,size_t count, loff_t *f_pos)
 {
-/*please complete the function on your own*/
+char *tmp;
+/*compute the data from the buffer in which the userspace function writes*/
+// tmp=buf+count-1;
+//if(count>1)
+//print error message
+if(count>1){
+tmp=buf;
+copy_from_user(onebyte_data,tmp,1);
+return -ENOSPC;
+}
+
+else{
+tmp=buf;
+
+/*Transfers data from userspace to kernel space*/
+
+ copy_from_user(onebyte_data,tmp,1);
+
+  return 1;
+}
+
 }
 
 static int onebyte_init(void)
